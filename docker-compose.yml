@@ -1,13 +1,10 @@
-version: '2.1'
-
-networks:
-  monitor-net:
-    driver: bridge
+# docker-compose.yml
+version: '3.5'
 
 volumes:
     prometheus_data: {}
     grafana_data: {}
-
+    
 services:
 
   prometheus:
@@ -26,8 +23,6 @@ services:
     restart: unless-stopped
     expose:
       - 9090
-    networks:
-      - monitor-net
     labels:
       org.label-schema.group: "monitoring"
 
@@ -42,8 +37,6 @@ services:
     restart: unless-stopped
     expose:
       - 9093
-    networks:
-      - monitor-net
     labels:
       org.label-schema.group: "monitoring"
 
@@ -62,28 +55,9 @@ services:
     restart: unless-stopped
     expose:
       - 9100
-    networks:
-      - monitor-net
     labels:
       org.label-schema.group: "monitoring"
-
-  cadvisor:
-    image: google/cadvisor:v0.33.0
-    container_name: cadvisor
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      #- /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
-    restart: unless-stopped
-    expose:
-      - 8080
-    networks:
-      - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
-
+  
   grafana:
     image: grafana/grafana:6.3.6
     container_name: grafana
@@ -100,19 +74,6 @@ services:
     restart: unless-stopped
     expose:
       - 3000
-    networks:
-      - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
-
-  pushgateway:
-    image: prom/pushgateway:v0.9.1
-    container_name: pushgateway
-    restart: unless-stopped
-    expose:
-      - 9091
-    networks:
-      - monitor-net
     labels:
       org.label-schema.group: "monitoring"
 
@@ -130,7 +91,8 @@ services:
       - ADMIN_USER=${ADMIN_USER:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
     restart: unless-stopped
-    networks:
-      - monitor-net
     labels:
       org.label-schema.group: "monitoring"
+
+networks:
+    default:
